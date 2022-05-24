@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} Page</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <h1>Welcome, {{ user_name | default('Stranger', true) | upper() }}!</h1>
+    <a href="/about">About me</a>
+</body>
+</html>

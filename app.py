@@ -1,27 +1,35 @@
-from flask import Flask, redirect
+from flask import Flask, redirect, render_template
 from flask import url_for
+from flask import render_template
 
 app = Flask(__name__)
 
 
-# comment
-@app.route('/home_page')
-def hello_world():
-    var = foo()
-
-    return f'Welcome to HOME Page, {var}'
+# @app.route('/')
+# def index_func():
+#     return render_template('index.html')
 
 
-def foo():
-    return 'abc'
+# root of our website
+@app.route('/')
+def index_func():
+    user_from_db = 'aRIeL'
+    user_second_name_from_db = 'Katz'
+    return render_template('home_page.html',
+                           user_name=user_from_db,
+                           # user_second_name=user_second_name_from_db,
+                           title='Home')
 
 
 @app.route('/about')
 def about_page():
-    # return 'Welcome to about Page'
-    # DB actions
-    foo()
-    return redirect(url_for('hello_world'))
+
+    return render_template('about_page.html')
+
+# def foo():
+#     return 'abc'
+
+
 
 
 if __name__ == '__main__':
