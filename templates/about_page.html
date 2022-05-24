@@ -1,48 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>About Page</title>
-    {% include('styles.html') %}
-</head>
-<body>
-    {% include('header.html') %}
+{% extends 'base.html' %}
+{% block title %}About Page{% endblock %}
+
+{% block tohen %}
+
     <h1>About Me</h1>
     {% if user_info %}
         <div class="container">
         <h2>User Info</h2>
         <br>
-        <h3>Name: {{ user_info['name'] }}</h3>
-        <h3>Second Name: {{ user_info['second_name'] }}</h3>
-        <h3>Nickname: {{ user_info['nickname'] }}</h3>
+            {% for title, value in user_info.items() %}
+                <h3>{{ title }}: {{ value }}</h3>
+            {% endfor %}
     </div>
     <div class="container">
         <h2>User Degrees</h2>
         <ol>
-            <li>
-                <h3>{{ user_degrees[0] | upper() }} degree</h3>
-            </li>
-            <li>
-                <h3>{{ user_degrees[1] | upper() }} degree</h3>
-            </li>
-            <li>
-                <h3>{{ user_degrees[2] | upper() }} degree</h3>
-            </li>
+            {% for degree in user_degrees %}
+                <li>
+                    <h3>{{ degree | upper() }} degree</h3>
+                </li>
+            {% endfor %}
         </ol>
     </div>
     <div class="container">
         <h2>User Hobbies</h2>
         <ul>
-            <li>{{ hobbies[0] }}</li>
-            <li>{{ hobbies[1] }}</li>
-            <li>{{ hobbies[2] }}</li>
-            <li>{{ hobbies[3] }}</li>
+            {% for hobbie in hobbies %}
+                <li>{{ hobbie }}</li>
+            {% endfor %}
         </ul>
     </div>
     {% else %}
         <h3>No info. Please log in.</h3>
     {% endif %}
-
-    {% include('footer.html') %}
-</body>
-</html>
+{% endblock %}

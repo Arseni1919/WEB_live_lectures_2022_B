@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    {% include('styles.html') %}
+</head>
+<body>
+    {% include('header.html') %}
+    {% block tohen %}
+            <h1>Message from BASE Page!</h1>
+    {% endblock %}
+    {% include('footer.html') %}
+</body>
+</html>

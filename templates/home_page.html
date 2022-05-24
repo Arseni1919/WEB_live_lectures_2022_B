@@ -1,19 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+{% extends 'base.html' %}
     {% set title='InDeX' %}
-    <title>{{ title }} Page</title>
-    {% include('styles.html') %}
-</head>
-<body>
-    {% include('header.html') %}
+    {% block title %}{{ title }} Page{% endblock %}
+
+{% block tohen %}
     {% if user_name %}
         <h1>Welcome, {{ user_name | default('Stranger', true) | upper() }}!</h1>
     {% else %}
         <h1>Please log in!</h1>
     {% endif %}
     <h2 class="{% if user_name %}loggedin{% else %}no_user{% endif %}">Check</h2>
-    {% include('footer.html') %}
-</body>
-</html>
+{% endblock %}

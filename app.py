@@ -24,14 +24,16 @@ def index_func():
 def about_page():
     user_info = {'name': 'Jacky', 'second_name': 'Sparrow', 'nickname': 'pirate'}
     degrees = ['BSc', 'MsD', 'PhD']
-    hobbies = ('drawing', 'books', 'ships', 'chips')
+    hobbies = ('drawing', 'books', 'ships', 'chips', 'TV', 'sea')
     return render_template('about_page.html',
-                           # user_info=user_info,
+                           user_info=user_info,
                            user_degrees=degrees,
                            hobbies=hobbies)
 
-# def foo():
-#     return 'abc'
+
+@app.route('/catalog')
+def catalog_func():
+    return render_template('catalog_page.html')
 
 
 
