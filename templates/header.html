@@ -1,5 +1,10 @@
 <header>
     <a href="/">Home Page</a> |
     <a href="/about">About me</a> |
-    <a href="/catalog">Catalog</a>
+    <a href="/catalog">Catalog</a> |
+    {% if session['logedin'] %}
+        <a href="/log_out">Log Out</a>
+    {% else %}
+        <a href="/log_in">Log In</a>
+    {% endif %}
 </header>

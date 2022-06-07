@@ -5,12 +5,46 @@
 {% block tohen %}
 
 <h1>Your Catalog</h1>
-    <ol>
-    <li>Item #</li>
-    <li>Item #</li>
-    <li>Item #</li>
-    <li>Item #</li>
-    <li>Item #</li>
-    </ol>
-    {{ super() }}
+
+    <form action="/catalog">
+        <input type="text" name="product_name" placeholder="Product Name">
+        <input type="text" name="product_color" placeholder="Color">
+        <input type="text" name="product_size" placeholder="Size">
+        <input type="submit" value="Find">
+    </form>
+
+    {% if product_name %}
+        <h2>{{ product_name }}</h2>
+        <h3>Price: {{ product_price }}</h3>
+        <h3>Color: {{ product_color }}</h3>
+        <h3>Size: {{ product_size }}</h3>
+    {% endif %}
+
+    {% if message %}
+        <h3 style="color: red">{{ message }}</h3>
+    {% endif %}
+
+    {% if catalog_dict %}
+        <ol>
+            {% for k, v in catalog_dict.items() %}
+                <li><h2>Name: {{ k }}</h2></li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+
+    
+    
+
+
+{#    <form method="GET" action="/catalog">#}
+{#        <input name="product" type="text" placeholder="Product Name">#}
+{#        <input name="color" type="text" placeholder="What Color">#}
+{#        <input type="submit">#}
+{#    </form>#}
+
+
 {% endblock %}
+
+
+
+
