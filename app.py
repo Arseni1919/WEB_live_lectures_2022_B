@@ -3,6 +3,8 @@ from flask import url_for
 from flask import render_template
 from datetime import timedelta
 from flask import request, session, jsonify
+import mysql.connector
+
 app = Flask(__name__)
 
 app.secret_key = '123'
@@ -58,6 +60,7 @@ def catalog_func():
     return render_template('catalog_page.html',
                            catalog_dict=catalog_dict)
 
+
 user_dict = {
     'arsenip': '1919',
     'yossi': '1234'
@@ -98,51 +101,99 @@ def session_func():
     # print(session['CHECK'])
     return jsonify(dict(session))
 
-# @app.route('/catalog', methods=['POST', 'PUT', 'DELETE', 'GET'])
-# def catalog_func():
-#     curr_user = {'firstname': "Ariel", 'lastname': "Perchik", 'wok': 'BGU', 'adress': 'Israel'}
+
+# ------------------------------------------------- #
+# ------------- DATABASE CONNECTION --------------- #
+# ------------------------------------------------- #
+def interact_db(query, query_type: str):
+    return_value = False
+    connection = mysql.connector.connect(host='localhost',
+                                         user='root',
+                                         passwd='root1234',
+                                         database='myflaskappdb')
+    cursor = connection.cursor(named_tuple=True)
+    cursor.execute(query)
+    #
+
+    if query_type == 'commit':
+        # Use for INSERT, UPDATE, DELETE statements.
+        # Returns: The number of rows affected by the query (a non-negative int).
+        connection.commit()
+        return_value = True
+
+    if query_type == 'fetch':
+        # Use for SELECT statement.
+        # Returns: False if the query failed, or the result of the query if it succeeded.
+        query_result = cursor.fetchall()
+        return_value = query_result
+
+    connection.close()
+    cursor.close()
+    return return_value
+
+
+# query = "INSERT INTO try_table_1(name) VALUES ('try_name_1')"
+# interact_db(query=query, query_type='commit')
 #
-#     current_method = request.method
-#     if 'username' in session:
-#         user_name, last_name = session['username'], session['lastname']
-#     else:
-#         if current_method == 'GET':
-#             if 'username' in request.args:
-#                 user_name = request.args['username']
-#                 last_name = request.args['lastname']
-#             else:
-#                 user_name, last_name = '', ''
-#         elif current_method == 'POST':
-#             if 'username' in request.form:
-#                 user_name = request.form['username']
-#                 last_name = request.form['lastname']
-#             else:
-#                 user_name, last_name = '', ''
-#         else:
-#             user_name, last_name = '', ''
-#         session['username'] = ''
-#         session['lastname'] = ''
-#     return render_template('catalog.html',
-#                            curr_user=curr_user,
-#                            user_name=user_name,
-#                            last_name=last_name,
-#                            current_method=current_method)
-#
-# @app.route('/log_out')
-# def log_out():
-#     session['username'] = ''
-#     session['lastname'] = ''
-#     return redirect(url_for('index'))
-#
-#
-# @app.route('/log_in', methods=['GET', 'POST'])
-# def log_in():
-#     if request.method == 'GET':
-#         return render_template('log_in.html')
-#     if request.method == 'POST':
-#         session['username'] = request.form['username']
-#         session['lastname'] = request.form['lastname']
-#     return redirect(url_for('index'))
+# query = "select * from try_table_1"
+# query_result = interact_db(query=query, query_type='fetch')
+# print(query_result)
+# ------------------------------------------------- #
+# ------------------------------------------------- #
+
+
+# ------------------------------------------------- #
+# ------------------- SELECT ---------------------- #
+# ------------------------------------------------- #
+@app.route('/users')
+def users():
+    return render_template('users.html')
+
+# @app.route('/users')
+# def users():
+#     query = "select * from users"
+#     query_result = interact_db(query=query, query_type='fetch')
+#     return render_template('users.html', users=query_result)
+
+
+# ------------------------------------------------- #
+# ------------------------------------------------- #
+
+
+# ------------------------------------------------- #
+# -------------------- INSERT --------------------- #
+# ------------------------------------------------- #
+@app.route('/insert_user', methods=['GET', 'POST'])
+def insert_user():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        # recheck
+        query = "INSERT INTO users(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
+        interact_db(query=query, query_type='commit')
+        return redirect('/users')
+    return render_template('insert_user.html', req_method=request.method)
+
+
+# ------------------------------------------------- #
+# ------------------------------------------------- #
+
+
+# ------------------------------------------------- #
+# -------------------- DELETE --------------------- #
+# ------------------------------------------------- #
+
+@app.route('/delete_user', methods=['POST'])
+def delete_user():
+    user_id = request.form['id']
+    query = "DELETE FROM users WHERE id='%s';" % user_id
+    interact_db(query, query_type='commit')
+    return redirect('/users')
+
+
+# ------------------------------------------------- #
+# ------------------------------------------------- #
 
 
 if __name__ == '__main__':
