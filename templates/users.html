@@ -6,7 +6,32 @@
 
     <h1>Users Page</h1>
 
-    <h2>Form:</h2>
+
+    <div class="container">
+    <h2>Insert Form</h2>
+        <form action="/insert_user" method="post">
+            <input type="text" name="name" placeholder="Insert Name">
+            <input type="email" name="email" placeholder="Email">
+            <input type="password" name="password" placeholder="Insert password">
+            <input type="submit">
+            
+        </form>
+    </div>
+
+    {% for user in users %}
+        <div class="container">
+{#            {{ user }}#}
+            <h3>{{ user.name }}</h3>
+            <h4>Email: {{ user.email }}</h4>
+            <h3 style="color: cadetblue">Date: {{ user.create_date }}</h3>
+
+            <form action="/delete_user" method="post">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="submit" value="Delete">
+            </form>
+
+        </div>
+    {% endfor %}
 
 {% endblock %}
 
