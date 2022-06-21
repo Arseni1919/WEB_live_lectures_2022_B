@@ -1,0 +1,43 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Fetch - BackEnd{% endblock %}
+
+{% block tohen %}
+
+    <h1>Fetch - BackEnd</h1>
+        {% if time %}
+        {% if session.sync_time %}
+            <h2>[SYNC] Time to finish: {{ session.sync_time }} to get: {{ session.sync_num }} items</h2>
+        {% endif %}
+        {% if session.async_time %}
+            <h2>[ASYNC] Time to finish: {{ session.async_time }} to get: {{ session.async_num }} items</h2>
+        {% endif %}
+    {% endif %}
+
+    <h3>Sync:</h3>
+    <form action="/fetch_be" method="get">
+        Num: <input type="text" name="num" value={{ session.num | default(3, true) }}>
+        <input type="hidden" name="type" value="sync">
+        <input type="submit" value="Get Random Pockemons">
+    </form>
+
+    <h3>Async:</h3>
+    <form action="/fetch_be" method="get">
+        Num: <input type="text" name="num" value={{ session.num | default(3, true) }}>
+        <input type="hidden" name="type" value="async">
+        <input type="submit" value="Get Random Pockemons">
+    </form>
+
+    {% if session.pockemons %}
+        {% for user in session.pockemons %}
+            <h3>Pockemon {{ user.id }}: </h3>
+            <img src="{{ user.sprites.front_default }}" alt="pic">
+            <h4>Name: {{ user.name }}</h4>
+            <h4>height: {{ user.height }}</h4>
+            <h4>Weight: {{ user.weight }}</h4>
+            <hr>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}

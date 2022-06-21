@@ -1,9 +1,16 @@
+import random
+
 from flask import Flask, redirect, render_template
 from flask import url_for
 from flask import render_template
 from datetime import timedelta
 from flask import request, session, jsonify
 import mysql.connector
+import time
+import requests
+import asyncio
+import aiohttp
+
 
 app = Flask(__name__)
 
@@ -147,7 +154,7 @@ def interact_db(query, query_type: str):
 # ------------------------------------------------- #
 @app.route('/users')
 def users():
-    query = 'select * from users'
+    query = 'select * from pockemons'
     users_list = interact_db(query, query_type='fetch')
     return render_template('users.html', users=users_list)
 # ------------------------------------------------- #
@@ -163,9 +170,9 @@ def insert_user():
     email = request.form['email']
     password = request.form['password']
     print(f'{name} {email} {password}')
-    query = "INSERT INTO users(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
+    query = "INSERT INTO pockemons(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
     interact_db(query=query, query_type='commit')
-    return redirect('/users')
+    return redirect('/pockemons')
 
 
 # @app.route('/insert_user', methods=['GET', 'POST'])
@@ -175,9 +182,9 @@ def insert_user():
 #         email = request.form['email']
 #         password = request.form['password']
 #         # recheck
-#         query = "INSERT INTO users(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
+#         query = "INSERT INTO pockemons(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
 #         interact_db(query=query, query_type='commit')
-#         return redirect('/users')
+#         return redirect('/pockemons')
 #     return render_template('insert_user.html', req_method=request.method)
 
 
@@ -191,22 +198,104 @@ def insert_user():
 @app.route('/delete_user', methods=['POST'])
 def delete_user_func():
     user_id = request.form['user_id']
-    query = "DELETE FROM users WHERE id='%s';" % user_id
+    query = "DELETE FROM pockemons WHERE id='%s';" % user_id
     # print(query)
     interact_db(query, query_type='commit')
-    return redirect('/users')
+    return redirect('/pockemons')
 
 
 # @app.route('/delete_user', methods=['POST'])
 # def delete_user():
 #     user_id = request.form['id']
-#     query = "DELETE FROM users WHERE id='%s';" % user_id
+#     query = "DELETE FROM pockemons WHERE id='%s';" % user_id
 #     interact_db(query, query_type='commit')
-#     return redirect('/users')
+#     return redirect('/pockemons')
 
 
 # ------------------------------------------------- #
 # ------------------------------------------------- #
+
+@app.route('/fetch_fe')
+def fetch_fe_func():
+    return render_template('fetch_frontend.html')
+
+
+def get_users_sync(from_val, until_val):
+    pockemons = []
+    for i in range(from_val, until_val):
+        res = requests.get(f'https://pokeapi.co/api/v2/pokemon/{i}')
+        print(res)
+        pockemons.append(res.json())
+    return pockemons
+
+
+async def fetch_url(client_session, url):
+    """Fetch the specified URL using the aiohttp session specified."""
+    # response = await session.get(url)
+    async with client_session.get(url, ssl=False) as resp:
+        response = await resp.json()
+        return response
+
+
+async def get_all_urls(from_val, until_val):
+    async with aiohttp.ClientSession(trust_env=True) as client_session:
+        tasks = []
+        for i in range(from_val, until_val):
+            url = f'https://pokeapi.co/api/v2/pokemon/{i}'
+            task = asyncio.create_task(fetch_url(client_session, url))
+            tasks.append(task)
+        data = await asyncio.gather(*tasks)
+    return data
+
+
+def save_users_to_session(pockemons):
+    users_list_to_save = []
+    for user in pockemons:
+        user_dict = {}
+        user_dict['sprites'] = {}
+        user_dict['sprites']['front_default'] = user['sprites']['front_default']
+        user_dict['name'] = user['name']
+        user_dict['height'] = user['height']
+        user_dict['weight'] = user['weight']
+        users_list_to_save.append(user_dict)
+    session['pockemons'] = users_list_to_save
+
+
+@app.route('/fetch_be')
+def fetch_be_func():
+    if 'type' in request.args:
+        start_time = time.time()
+        # from_val, until_val = int(request.args['from']), int(request.args['until'])
+        num = int(request.args['num'])
+        rand_start = random.randint(1, 30)
+        rand_end = rand_start + num
+        session['num'] = num
+        pockemons = []
+
+        # SYNC
+        if request.args['type'] == 'sync':
+            pockemons = get_users_sync(rand_start, rand_end)
+
+        # ASYNC
+        if request.args['type'] == 'async':
+            pockemons = asyncio.run(get_all_urls(rand_start, rand_end))
+            print('run')
+
+        end_time = time.time()
+        time_to_finish = f'{end_time - start_time: .2f} seconds'
+        session[f'{request.args["type"]}_time'] = time_to_finish
+        session[f'{request.args["type"]}_num'] = session['num']
+
+        save_users_to_session(pockemons)
+
+        return render_template('fetch_backend.html',
+                               users=pockemons,
+                               time=time_to_finish,
+                               from_val=rand_start, until_val=rand_end,
+                               type_req=request.args['type'])
+    else:
+        session.clear()
+        return render_template('fetch_backend.html')
 
 
 if __name__ == '__main__':
