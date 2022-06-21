@@ -8,6 +8,8 @@ from flask import request, session, jsonify
 import mysql.connector
 import time
 import requests
+
+
 import asyncio
 import aiohttp
 
@@ -199,15 +201,6 @@ def fetch_fe_func():
     return render_template('fetch_frontend.html')
 
 
-def get_users_sync(from_val, until_val):
-    pockemons = []
-    for i in range(from_val, until_val):
-        res = requests.get(f'https://pokeapi.co/api/v2/pokemon/{i}')
-        print(res)
-        pockemons.append(res.json())
-    return pockemons
-
-
 async def fetch_url(client_session, url):
     """Fetch the specified URL using the aiohttp session specified."""
     # response = await session.get(url)
@@ -242,6 +235,28 @@ def save_users_to_session(pockemons):
     session['pockemons'] = users_list_to_save
 
 
+def get_pockemons_sync(from_val, until_val):
+    pockemons = []
+    for i in range(from_val, until_val):
+        res = requests.get(f'https://pokeapi.co/api/v2/pokemon/{i}')
+        print(res)
+        pockemons.append(res.json())
+    return pockemons
+
+
+# @app.route('/fetch_be')
+# def fetch_be_func():
+#     if 'type' in request.args:
+#         num = int(request.args['num'])
+#         random_start = random.randint(1, 30)
+#         random_end = random_start + num
+#         session['num'] = num
+#         pockemons = get_pockemons_sync(random_start, random_end)
+#         save_users_to_session(pockemons)
+#     else:
+#         session.clear()
+#     return render_template('fetch_backend.html')
+
 @app.route('/fetch_be')
 def fetch_be_func():
     if 'type' in request.args:
@@ -255,7 +270,7 @@ def fetch_be_func():
 
         # SYNC
         if request.args['type'] == 'sync':
-            pockemons = get_users_sync(rand_start, rand_end)
+            pockemons = get_pockemons_sync(rand_start, rand_end)
 
         # ASYNC
         if request.args['type'] == 'async':
