@@ -154,7 +154,7 @@ def interact_db(query, query_type: str):
 # ------------------------------------------------- #
 @app.route('/users')
 def users():
-    query = 'select * from pockemons'
+    query = 'select * from users'
     users_list = interact_db(query, query_type='fetch')
     return render_template('users.html', users=users_list)
 # ------------------------------------------------- #
@@ -170,22 +170,9 @@ def insert_user():
     email = request.form['email']
     password = request.form['password']
     print(f'{name} {email} {password}')
-    query = "INSERT INTO pockemons(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
+    query = "INSERT INTO users(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
     interact_db(query=query, query_type='commit')
-    return redirect('/pockemons')
-
-
-# @app.route('/insert_user', methods=['GET', 'POST'])
-# def insert_user():
-#     if request.method == 'POST':
-#         name = request.form['name']
-#         email = request.form['email']
-#         password = request.form['password']
-#         # recheck
-#         query = "INSERT INTO pockemons(name, email, password) VALUES ('%s', '%s', '%s')" % (name, email, password)
-#         interact_db(query=query, query_type='commit')
-#         return redirect('/pockemons')
-#     return render_template('insert_user.html', req_method=request.method)
+    return redirect('/users')
 
 
 # ------------------------------------------------- #
@@ -198,22 +185,14 @@ def insert_user():
 @app.route('/delete_user', methods=['POST'])
 def delete_user_func():
     user_id = request.form['user_id']
-    query = "DELETE FROM pockemons WHERE id='%s';" % user_id
+    query = "DELETE FROM users WHERE id='%s';" % user_id
     # print(query)
     interact_db(query, query_type='commit')
-    return redirect('/pockemons')
-
-
-# @app.route('/delete_user', methods=['POST'])
-# def delete_user():
-#     user_id = request.form['id']
-#     query = "DELETE FROM pockemons WHERE id='%s';" % user_id
-#     interact_db(query, query_type='commit')
-#     return redirect('/pockemons')
-
+    return redirect('/users')
 
 # ------------------------------------------------- #
 # ------------------------------------------------- #
+
 
 @app.route('/fetch_fe')
 def fetch_fe_func():
