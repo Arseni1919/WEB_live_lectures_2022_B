@@ -1,5 +1,4 @@
-// const curr_main = document.querySelector('main');
-// console.log(curr_main);
+
 let str1 = 'Hello World!!!:)';
 
 console.log(str1);
@@ -33,8 +32,3 @@ function createUsersList(users){
         curr_main.appendChild(section);
     }
 }
-
-// function createUsersList(pockemons){
-//     const user = pockemons[0];
-//     console.log(user);
-// }

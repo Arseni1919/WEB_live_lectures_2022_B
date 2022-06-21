@@ -6,14 +6,13 @@
 {% block tohen %}
 
     <h1>Fetch - BackEnd</h1>
-        {% if time %}
         {% if session.sync_time %}
             <h2>[SYNC] Time to finish: {{ session.sync_time }} to get: {{ session.sync_num }} items</h2>
         {% endif %}
         {% if session.async_time %}
             <h2>[ASYNC] Time to finish: {{ session.async_time }} to get: {{ session.async_num }} items</h2>
         {% endif %}
-    {% endif %}
+
 
     <h3>Sync:</h3>
     <form action="/fetch_be" method="get">

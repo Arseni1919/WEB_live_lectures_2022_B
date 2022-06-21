@@ -250,14 +250,16 @@ async def get_all_urls(from_val, until_val):
 
 def save_users_to_session(pockemons):
     users_list_to_save = []
-    for user in pockemons:
-        user_dict = {}
-        user_dict['sprites'] = {}
-        user_dict['sprites']['front_default'] = user['sprites']['front_default']
-        user_dict['name'] = user['name']
-        user_dict['height'] = user['height']
-        user_dict['weight'] = user['weight']
-        users_list_to_save.append(user_dict)
+    for pockemon in pockemons:
+        pockemons_dict = {
+            'sprites': {
+                'front_default': pockemon['sprites']['front_default']
+            },
+            'name': pockemon['name'],
+            'height': pockemon['height'],
+            'weight': pockemon['weight'],
+        }
+        users_list_to_save.append(pockemons_dict)
     session['pockemons'] = users_list_to_save
 
 
@@ -287,15 +289,9 @@ def fetch_be_func():
         session[f'{request.args["type"]}_num'] = session['num']
 
         save_users_to_session(pockemons)
-
-        return render_template('fetch_backend.html',
-                               users=pockemons,
-                               time=time_to_finish,
-                               from_val=rand_start, until_val=rand_end,
-                               type_req=request.args['type'])
     else:
         session.clear()
-        return render_template('fetch_backend.html')
+    return render_template('fetch_backend.html')
 
 
 if __name__ == '__main__':
