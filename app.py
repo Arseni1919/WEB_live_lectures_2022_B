@@ -288,5 +288,15 @@ def fetch_be_func():
     return render_template('fetch_backend.html')
 
 
+@app.route('/get_json')
+def json_func():
+    sample_dic = {
+        'name': 'Yossi',
+        'age': 25,
+        'hobbies': ['swimming', 'art', 'sports']
+    }
+    return jsonify(sample_dic)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
