@@ -298,5 +298,28 @@ def json_func():
     return jsonify(sample_dic)
 
 
+# ------------------------------------------------- #
+# --------------- URL PARAMETERS ------------------ #
+# ------------------------------------------------- #
+@app.route('/profile', defaults={'user_id': -1})
+@app.route('/profile/<int:user_id>')
+def profile_func(user_id):
+    # DB
+    response = {}
+
+    if user_id == -1:
+        response['message'] = 'No user inserted'
+
+    else:
+
+        query = "SELECT * FROM users WHERE id='%s';" % user_id
+        query_result = interact_db(query=query, query_type='fetch')
+        if len(query_result) != 0:
+            response = query_result[0]
+
+    response = jsonify(response)
+    return response
+
+
 if __name__ == '__main__':
     app.run(debug=True)
