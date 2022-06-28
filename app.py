@@ -9,10 +9,8 @@ import mysql.connector
 import time
 import requests
 
-
 import asyncio
 import aiohttp
-
 
 app = Flask(__name__)
 
@@ -28,7 +26,7 @@ def index_func():
     user_second_name_from_db = 'Katz'
     return render_template('home_page.html',
                            user_name=user_from_db)
-                           # user_second_name=user_second_name_from_db)
+    # user_second_name=user_second_name_from_db)
 
 
 @app.route('/about')
@@ -159,6 +157,8 @@ def users():
     query = 'select * from users'
     users_list = interact_db(query, query_type='fetch')
     return render_template('users.html', users=users_list)
+
+
 # ------------------------------------------------- #
 # ------------------------------------------------- #
 
@@ -191,6 +191,7 @@ def delete_user_func():
     # print(query)
     interact_db(query, query_type='commit')
     return redirect('/users')
+
 
 # ------------------------------------------------- #
 # ------------------------------------------------- #
@@ -319,6 +320,39 @@ def profile_func(user_id):
 
     response = jsonify(response)
     return response
+
+
+@app.route('/get_users', defaults={'user_id': -1})
+@app.route('/get_users/<user_id>')
+def get_user(user_id):
+    if user_id == -1:
+        query = f'select * from users'
+        users_list = interact_db(query, query_type='fetch')
+        return_list = []
+        for user in users_list:
+            user_dict = {
+                'name': user.name,
+                'email': user.email,
+                'create_date': user.create_date
+            }
+            return_list.append(user_dict)
+        return jsonify(return_list)
+
+    query = f'select * from users where id={user_id}'
+    users_list = interact_db(query, query_type='fetch')
+
+    if len(users_list) == 0:
+        return_dict = {
+            'message': 'user not found'
+        }
+    else:
+        user_list = users_list[0]
+        return_dict = {
+            'name': user_list.name,
+            'email': user_list.email,
+            'create_date': user_list.create_date
+        }
+    return jsonify(return_dict)
 
 
 if __name__ == '__main__':
